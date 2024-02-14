@@ -1,0 +1,12 @@
+services:
+  - name: dummy
+    path: /service
+    type: RoundRobin
+    servers:
+      - host: http://host.org
+        port: 8080
+      - host: http://another-host.org
+        port: 8188
+    rate-limiter:
+      max-requests: 3
+      window-size: 1000

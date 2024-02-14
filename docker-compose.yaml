@@ -15,6 +15,7 @@ services:
     environment:
       - REDIS_URI=redis:6379
       - REDIS_PASSWORD=password
+      - CONFIG_PATH=examples/example.yaml
   redis:
     image: redis:latest
     restart: always

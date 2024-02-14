@@ -8,5 +8,6 @@ services:
       - host: http://another-host.org
         port: 8188
     rate-limiter:
-      max-requests: 3
-      window-size: 1000
+      name: dummy
+      max-requests: 2
+      window-size: 2000

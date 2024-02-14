@@ -5,27 +5,25 @@ import (
 	"os"
 
 	util "github.com/dimitrijed93/load-balancer/util"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
 type FileSystemConfigParser struct {
-	data LoadBalancerConfig
+	Config LoadBalancerConfig
 }
 
-func (ycp FileSystemConfigParser) Parse(input string) (*LoadBalancerConfig, error) {
+func NewConfigParser(input string) (*FileSystemConfigParser, error) {
 	if input == util.EMPTY_STRING {
-		return &LoadBalancerConfig{}, errors.New("Input file is empty")
+		return &FileSystemConfigParser{}, errors.New("Input file is empty")
 	}
 	configFile, err := os.ReadFile(input)
 	if err != nil {
-		return &LoadBalancerConfig{}, errors.New("Unable to read config file")
+		return &FileSystemConfigParser{}, errors.New("Unable to read config file")
 	}
 	var config LoadBalancerConfig
 	err = yaml.Unmarshal(configFile, &config)
 	if err != nil {
-		return &LoadBalancerConfig{}, err
+		return &FileSystemConfigParser{}, err
 	}
-	log.Info().Msgf("FileSystemConfigParser >> Loaded config %s", config)
-	return &config, nil
+	return &FileSystemConfigParser{Config: config}, nil
 }

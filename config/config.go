@@ -18,6 +18,7 @@ type ServerConfig struct {
 }
 
 type RateLimiterConfig struct {
+	Name        string `yaml:"name"`
 	MaxRequests uint32 `yaml:"max-requests"`
 	WindowSize  uint32 `yaml:"window-size"`
 }

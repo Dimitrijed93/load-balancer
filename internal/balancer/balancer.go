@@ -3,8 +3,10 @@ package balancer
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 
+	customerrors "github.com/dimitrijed93/load-balancer/internal/custom_errors"
 	destination "github.com/dimitrijed93/load-balancer/internal/destination"
 	ratelimiter "github.com/dimitrijed93/load-balancer/internal/rate-limiter"
 
@@ -18,14 +20,12 @@ type Balancer interface {
 	Balance() *destination.Destination
 }
 
-func NewBalancer(uri string) Balancer {
-	cp := config.FileSystemConfigParser{}
-	cnf, err := cp.Parse("examples/example.yaml")
+func NewBalancer(uri string) (Balancer, error) {
+	cp, err := config.NewConfigParser(os.Getenv(util.ENV_VAR_CONFIG_PATH))
+	cnf := cp.Config
 	if err != nil {
 		log.Error().Msg("Unable to open config")
 	}
-
-	log.Info().Msgf("Balancer >> Found configuration %s", cnf.ServicesConfig)
 
 	var svc config.ServiceConfig
 	for _, item := range cnf.ServicesConfig {
@@ -52,14 +52,18 @@ func NewBalancer(uri string) Balancer {
 	log.Info().Msgf("Balancer >> New balancer of type %s", svc.Type)
 
 	if !svc.RateLimiterConfig.IsEmpty() {
-		rl := ratelimiter.NewRateLimiter(svc.RateLimiterConfig, svc.Name)
-		rl.Limit()
+		log.Info().Msgf("Balancer >> RateLimiterConfig not empty. WindowSize = %d MaxRequests = %d ServiceName = %s",
+			svc.RateLimiterConfig.WindowSize, svc.RateLimiterConfig.MaxRequests, svc.RateLimiterConfig.Name)
+		rl := ratelimiter.NewRateLimiter(svc.RateLimiterConfig)
+		if !rl.RequestAllowed() {
+			return nil, customerrors.RateLimitError{Limit: int(svc.RateLimiterConfig.MaxRequests)}
+		}
 	}
 
 	switch svc.Type {
 	case util.LOAD_BALANCER_TYPE_ROUND_ROBIN:
-		return roundrobin.NewRoundRobinBalancer(dst)
+		return roundrobin.NewRoundRobinBalancer(dst), nil
 	default:
-		return roundrobin.NewRoundRobinBalancer(dst)
+		return roundrobin.NewRoundRobinBalancer(dst), nil
 	}
 }

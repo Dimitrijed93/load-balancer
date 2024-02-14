@@ -7,21 +7,24 @@ import (
 )
 
 type RateLimiter struct {
-	config  config.RateLimiterConfig
-	sta     storage.StorageAdapter
-	svcName string
+	config config.RateLimiterConfig
+	sta    storage.StorageAdapter
 }
 
-func NewRateLimiter(rlc config.RateLimiterConfig, svcName string) *RateLimiter {
+func NewRateLimiter(rlc config.RateLimiterConfig) *RateLimiter {
 	return &RateLimiter{
-		config:  rlc,
-		sta:     storage.RedisStorageAdapter{},
-		svcName: svcName,
+		config: rlc,
+		sta:    storage.NewRedisStorageAdapter(),
 	}
 }
 
-func (rl RateLimiter) Limit() {
-	rl.sta.StoreRequest(rl.svcName)
-	r := rl.sta.CountRequests(rl.svcName)
-	log.Info().Msgf("RateLimiter >> Request count for svc name %s is %d", rl.svcName, r)
+func (rl RateLimiter) RequestAllowed() bool {
+	st, err := rl.sta.StoreRequest(rl.config.Name, rl.config.WindowSize)
+	if err != nil {
+		log.Error().Msgf("RateLimiter >> Storing request failed with %s \n", err)
+	}
+	log.Info().Msgf("RateLimiter >> Status of storing request %s \n", st)
+	r := rl.sta.CountRequests(rl.config.Name)
+	log.Info().Msgf("RateLimiter >> Request count for svc name %s is %d", rl.config.Name, r)
+	return r < int(rl.config.MaxRequests)
 }

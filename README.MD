@@ -2,4 +2,4 @@
 
 ## Features:
     - Load Balancer
-    - Circuit Breaker
+    - Rate Limiter

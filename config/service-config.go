@@ -12,6 +12,7 @@ type ServiceConfig struct {
 	Path              string             `yaml:"path"`
 	ServersConfig     []ServerConfig     `yaml:"servers"`
 	RateLimiterConfig *RateLimiterConfig `yaml:"rate-limiter"`
+	AuthConfig        AuthConfig         `yaml:"auth"`
 }
 
 type ServerConfig struct {

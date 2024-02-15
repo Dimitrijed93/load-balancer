@@ -10,4 +10,6 @@ services:
     rate-limiter:
       name: dummy
       max-requests: 2
-      window-size: 20000
+      window-size: 2000
+    auth:
+      enabled: false

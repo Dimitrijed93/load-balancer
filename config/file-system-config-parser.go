@@ -14,11 +14,11 @@ type FileSystemConfigParser struct {
 
 func NewConfigParser(input string) (*FileSystemConfigParser, error) {
 	if input == util.EMPTY_STRING {
-		return &FileSystemConfigParser{}, errors.New("Input file is empty")
+		return &FileSystemConfigParser{}, errors.New("input file is empty")
 	}
 	configFile, err := os.ReadFile(input)
 	if err != nil {
-		return &FileSystemConfigParser{}, errors.New("Unable to read config file")
+		return &FileSystemConfigParser{}, errors.New("unable to read config file")
 	}
 	var config LoadBalancerConfig
 	err = yaml.Unmarshal(configFile, &config)

@@ -17,19 +17,6 @@ type Balancer interface {
 }
 
 func NewBalancer(uri string, cnf config.ServiceConfig) (Balancer, error) {
-	// cp, err := config.NewConfigParser(os.Getenv(util.ENV_VAR_CONFIG_PATH))
-	// cnf := cp.Config
-	// if err != nil {
-	// 	log.Error().Msg("Unable to open config")
-	// }
-
-	// var svc config.ServiceConfig
-	// for _, item := range cnf.ServicesConfig {
-	// 	if strings.HasPrefix(uri, item.Path) {
-	// 		svc = item
-	// 	}
-	// }
-
 	var dst []destination.Destination
 
 	for _, item := range cnf.ServersConfig {
@@ -42,15 +29,6 @@ func NewBalancer(uri string, cnf config.ServiceConfig) (Balancer, error) {
 	}
 
 	log.Info().Msgf("Balancer >> New balancer of type %s", cnf.Type)
-
-	// if !svc.RateLimiterConfig.IsEmpty() {
-	// 	log.Info().Msgf("Balancer >> RateLimiterConfig not empty. WindowSize = %d MaxRequests = %d ServiceName = %s",
-	// 		svc.RateLimiterConfig.WindowSize, svc.RateLimiterConfig.MaxRequests, svc.RateLimiterConfig.Name)
-	// 	rl := ratelimiter.NewRateLimiter(svc.RateLimiterConfig)
-	// 	if !rl.RequestAllowed() {
-	// 		return nil, customerrors.RateLimitError{Limit: int(svc.RateLimiterConfig.MaxRequests)}
-	// 	}
-	// }
 
 	switch cnf.Type {
 	case util.LOAD_BALANCER_TYPE_ROUND_ROBIN:

@@ -1,23 +1,22 @@
 package web
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/dimitrijed93/load-balancer/config"
 	"github.com/dimitrijed93/load-balancer/internal/balancer"
-	customerrors "github.com/dimitrijed93/load-balancer/internal/custom_errors"
 	"github.com/rs/zerolog/log"
 )
 
 func RequestHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info().Msgf("RequestHandler >> Handling request for path %s", r.URL.Path)
-	blcr, err := balancer.NewBalancer(r.URL.Path)
 
-	var tooManyRequestError = &customerrors.RateLimitError{}
-	log.Error().Msg("ERR " + tooManyRequestError.Error())
+	cnf := config.NewServiceConfig(r.URL.Path)
 
-	if err != nil && errors.As(err, tooManyRequestError) {
-		w.WriteHeader(http.StatusTooManyRequests)
+	blcr, err := balancer.NewBalancer(r.URL.Path, cnf)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}

@@ -49,13 +49,15 @@ func (rsa RedisStorageAdapter) CountRequests(svcName string) int {
 	return c
 }
 
-func (rsa RedisStorageAdapter) StoreRequest(svcName string, exp uint32) (string, error) {
+func (rsa RedisStorageAdapter) StoreRequest(svcName string, exp int) (string, error) {
 	ctx := context.Background()
 	log.Info().Msgf("RedisStorageAdapter >> Storing request for service name %s", svcName)
 
 	now := time.Now().Unix()
+	d := time.Duration(exp * int(time.Millisecond))
+	log.Info().Msgf("EXPIRE %s ", d.String())
 	r, err := rsa.client.Conn().Set(ctx, svcName+time.Now().String(),
-		now, time.Duration(exp*uint32(time.Millisecond))).Result()
+		now, d).Result()
 
 	if err != nil {
 		panic(err.Error())

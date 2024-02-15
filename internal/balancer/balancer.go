@@ -21,7 +21,6 @@ func NewBalancer(uri string, cnf config.ServiceConfig) (Balancer, error) {
 
 	for _, item := range cnf.ServersConfig {
 		u := fmt.Sprintf("%s:%d%s", item.Host, item.Port, uri)
-		log.Info().Msgf("Balancer >> Build destination URI %s", u)
 		var targetUri *url.URL
 		targetUri, _ = url.Parse(u)
 		d := destination.Destination{Uri: targetUri}

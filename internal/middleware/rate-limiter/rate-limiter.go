@@ -34,7 +34,7 @@ func (rl RateLimiter) requestAllowed(config *config.RateLimiterConfig) bool {
 func (rl RateLimiter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	config := config.NewRateLimiterConfig(r.URL.Path)
 	allow := rl.requestAllowed(config)
-	log.Info().Msgf("RateLimiter >> Request is allowed %s", allow)
+	log.Info().Msgf("RateLimiter >> Request is allowed %t", allow)
 	if !allow {
 		w.WriteHeader(http.StatusTooManyRequests)
 		w.Write([]byte("RateLimiter >> Too many requests"))

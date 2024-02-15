@@ -5,6 +5,7 @@ import (
 
 	"github.com/dimitrijed93/load-balancer/config"
 	ratelimiter "github.com/dimitrijed93/load-balancer/internal/middleware/rate-limiter"
+	"github.com/dimitrijed93/load-balancer/internal/middleware/tracing"
 	"github.com/dimitrijed93/load-balancer/web"
 	"github.com/dimitrijed93/load-balancer/web/debug"
 )
@@ -17,7 +18,8 @@ func main() {
 	mux.HandleFunc("/debug", debug.RedisDebugHandler)
 	mux.HandleFunc("/", web.RequestHandler)
 
-	rlm := ratelimiter.NewRateLimiter(mux)
+	tm := tracing.NewTracing(mux)
+	rlm := ratelimiter.NewRateLimiter(tm)
 
 	http.ListenAndServe(":3030", rlm)
 }
